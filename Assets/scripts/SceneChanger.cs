@@ -3,13 +3,33 @@ using UnityEngine.SceneManagement;
 
 public class SceneChanger : MonoBehaviour
 {
-    public string sceneName = "Prueba1"; 
+    [Tooltip("Nombre de la escena a la que se cambiará")]
+    public string nombreEscenaDestino;
 
-    void OnTriggerEnter(Collider other)
+    private bool yaUsado = false;
+
+    void Start()
     {
-        if (other.CompareTag("Player"))
+        // Si esta zona ya fue usada antes, desactívala
+        if (PlayerPrefs.GetInt("zona_" + gameObject.name, 0) == 1)
         {
-            SceneManager.LoadScene(sceneName);
+            gameObject.SetActive(false);
+        }
+    }
+
+    private void OnTriggerEnter(Collider other)
+    {
+        // Verifica que el jugador sea quien entra
+        if (!yaUsado && other.CompareTag("Player"))
+        {
+            yaUsado = true;
+
+            // Marcar esta zona como usada para futuras cargas
+            PlayerPrefs.SetInt("zona_" + gameObject.name, 1);
+            PlayerPrefs.Save();
+
+            // Cambiar de escena
+            SceneManager.LoadScene(nombreEscenaDestino);
         }
     }
 }
