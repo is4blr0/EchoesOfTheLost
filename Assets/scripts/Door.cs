@@ -3,9 +3,10 @@ using UnityEngine;
 
 public class Door : MonoBehaviour
 {
-    public GameObject door; // Asignamos la puerta correspondiente al boton concreto en el inspector.
-    public float moveDistance = 2.0f; // Distancia que se movera la puerta.
-    public float moveSpeed = 2.0f; // Velocidad del movimiento de la puerta (hacia arriba).
+    public GameObject door;
+    public string puertaID = "puerta_01"; // ID única para esta puerta
+    public float moveDistance = 2.0f;
+    public float moveSpeed = 2.0f;
 
     private Vector3 initialPosition;
     private bool isActivated = false;
@@ -13,6 +14,13 @@ public class Door : MonoBehaviour
     void Start()
     {
         initialPosition = door.transform.position;
+
+        // Revisamos si ya estaba abierta antes
+        if (GameStateManag.instance != null && GameStateManag.instance.ObtenerEstado(puertaID))
+        {
+            door.transform.position = initialPosition + Vector3.up * moveDistance;
+            isActivated = true;
+        }
     }
 
     void OnTriggerEnter(Collider other)
@@ -21,6 +29,12 @@ public class Door : MonoBehaviour
         {
             isActivated = true;
             StartCoroutine(MoveDoor());
+
+            // Guardamos el estado como "abierto"
+            if (GameStateManag.instance != null)
+            {
+                GameStateManag.instance.GuardarEstado(puertaID, true);
+            }
         }
     }
 
